@@ -1,6 +1,8 @@
 package org.apache.metamodel.example.controllers;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.metamodel.DataContext;
@@ -28,8 +30,20 @@ public class MetadataController {
     public Map<String, Object> datastoreDetails(@PathVariable("datastoreName") String datastoreName) {
         final DataContext dataContext = getDataContext(datastoreName);
 
+        final List<Map<String, Object>> schemasInformation = new ArrayList<>();
+        final Schema defaultSchema = dataContext.getDefaultSchema();
+        final Schema[] schemas = dataContext.getSchemas();
+        for (Schema schema : schemas) {
+            final Map<String, Object> schemaInfo = new LinkedHashMap<String, Object>();
+            schemaInfo.put("name", schema.getName());
+            schemaInfo.put("default", schema == defaultSchema);
+            schemaInfo.put("table_count", schema.getTableCount());
+            schemasInformation.add(schemaInfo);
+        }
+
         final Map<String, Object> response = new LinkedHashMap<String, Object>();
-        response.put("schemas", dataContext.getSchemaNames());
+        response.put("schemas", schemasInformation);
+
         return response;
     }
 
@@ -54,14 +68,20 @@ public class MetadataController {
         final Schema schema = dataContext.getSchemaByName(schemaName);
         final Table table = schema.getTableByName(tableName);
 
+        final Column[] columns = table.getColumns();
+        final List<Map<String, Object>> columnsInformation = new ArrayList<>();
+        for (Column column : columns) {
+            final Map<String, Object> columnMap = getColumnMap(column);
+            columnsInformation.add(columnMap);
+        }
+
         final Map<String, Object> response = new LinkedHashMap<String, Object>();
         response.put("name", table.getName());
-        response.put("columns", table.getColumnNames());
         response.put("type", table.getType());
         response.put("remarks", table.getRemarks());
-
         final Column[] primaryKeys = table.getPrimaryKeys();
         response.put("primary_keys", CollectionUtils.map(primaryKeys, new HasNameMapper()));
+        response.put("columns", columnsInformation);
 
         return response;
     }
@@ -76,18 +96,21 @@ public class MetadataController {
         final Table table = schema.getTableByName(tableName);
         final Column column = table.getColumnByName(columnName);
 
-        final Map<String, Object> response = new LinkedHashMap<String, Object>();
+        final Map<String, Object> response = getColumnMap(column);
 
+        return response;
+    }
+
+    private Map<String, Object> getColumnMap(final Column column) {
+        final Map<String, Object> response = new LinkedHashMap<String, Object>();
         response.put("name", column.getName());
         response.put("type", column.getType() == null ? null : column.getType().getName());
         response.put("native_type", column.getNativeType());
         response.put("number", column.getColumnNumber());
         response.put("size", column.getColumnSize());
         response.put("remarks", column.getRemarks());
-
-        final Column[] primaryKeys = table.getPrimaryKeys();
-        response.put("primary_keys", CollectionUtils.map(primaryKeys, new HasNameMapper()));
-
+        response.put("indexed", column.isIndexed());
+        response.put("nullable", column.isNullable());
         return response;
     }
 
