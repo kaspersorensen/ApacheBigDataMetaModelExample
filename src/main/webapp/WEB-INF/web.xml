@@ -3,20 +3,6 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
 	
-	<!-- Spring listener -->
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
-
-	<!-- Spring config -->
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:org/apache/metamodel/example/application-context.xml</param-value>
-	</context-param>
-
 	<!-- Spring servlet -->
 	<servlet>
 		<servlet-name>spring</servlet-name>

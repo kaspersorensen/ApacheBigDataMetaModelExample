@@ -7,6 +7,10 @@
 		<artifactId>apache</artifactId>
 		<version>16</version>
 	</parent>
+	
+	<properties>
+		<jackson.version>2.6.1</jackson.version>
+	</properties>
 
 	<groupId>org.apache.metamodel</groupId>
 	<artifactId>ApacheBigDataMetaModelExample</artifactId>
@@ -18,7 +22,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version><!--$NO-MVN-MAN-VER$-->
+				<version>3.1</version><!--$NO-MVN-MAN-VER$ -->
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -28,6 +32,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.metamodel</groupId>
+			<artifactId>MetaModel-full</artifactId>
+			<version>4.3.6</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.metamodel</groupId>
 			<artifactId>MetaModel-spring</artifactId>
@@ -50,5 +59,22 @@
 			<version>2.0</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
 	</dependencies>
 </project>
