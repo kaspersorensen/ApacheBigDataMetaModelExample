@@ -18,6 +18,8 @@
 	<packaging>war</packaging>
 
 	<build>
+		<finalName>ApacheBigDataMetaModelExample</finalName>
+	
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -35,12 +37,12 @@
 		<dependency>
 			<groupId>org.apache.metamodel</groupId>
 			<artifactId>MetaModel-full</artifactId>
-			<version>4.3.6</version>
+			<version>4.4.0-RC1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.metamodel</groupId>
 			<artifactId>MetaModel-spring</artifactId>
-			<version>4.3.6</version>
+			<version>4.4.0-RC1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
