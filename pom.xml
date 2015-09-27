@@ -7,7 +7,7 @@
 		<artifactId>apache</artifactId>
 		<version>16</version>
 	</parent>
-	
+
 	<properties>
 		<jackson.version>2.6.1</jackson.version>
 	</properties>
@@ -19,7 +19,7 @@
 
 	<build>
 		<finalName>ApacheBigDataMetaModelExample</finalName>
-	
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -77,6 +77,10 @@
 			<artifactId>jackson-core</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.3-1102-jdbc4</version>
+		</dependency>
 	</dependencies>
 </project>
