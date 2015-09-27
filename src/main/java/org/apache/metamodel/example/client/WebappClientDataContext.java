@@ -1,6 +1,7 @@
 package org.apache.metamodel.example.client;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +27,6 @@ import org.apache.metamodel.schema.MutableTable;
 import org.apache.metamodel.schema.Schema;
 import org.apache.metamodel.schema.Table;
 import org.apache.metamodel.schema.TableType;
-import org.apache.metamodel.util.CollectionUtils;
-import org.apache.metamodel.util.Func;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.UrlEscapers;
@@ -40,6 +39,31 @@ public class WebappClientDataContext extends QueryPostprocessDataContext {
     public WebappClientDataContext(String serverUrl, String datastoreName) {
         _baseUrl = serverUrl + "/" + datastoreName;
         _httpClient = HttpClients.createSystem();
+    }
+
+    @Override
+    protected DataSet materializeMainSchemaTable(Table table, Column[] columns, int maxRows) {
+        // build a query string to send to the server
+        final Query q = new Query().from(table).select(columns);
+        if (maxRows > 0) {
+            q.setMaxRows(maxRows);
+        }
+        final String queryString = q.toSql();
+
+        // invoke the query via a HTTP request
+        final String escapedQuery = UrlEscapers.urlPathSegmentEscaper().escape(queryString);
+        final Map<String, Object> resultMap = invokeHttpGetAndParseMap(_baseUrl + "/query/" + escapedQuery);
+
+        // wrap the HTTP response as a DataSet
+        @SuppressWarnings("unchecked")
+        final List<List<Object>> rowValues = (List<List<Object>>) resultMap.get("data");
+
+        final List<Row> rows = new ArrayList<>();
+        final DataSetHeader header = new SimpleDataSetHeader(columns);
+        for (List<Object> values : rowValues) {
+            rows.add(new DefaultRow(header, values.toArray()));
+        }
+        return new InMemoryDataSet(header, rows);
     }
 
     @Override
@@ -119,30 +143,5 @@ public class WebappClientDataContext extends QueryPostprocessDataContext {
     @Override
     protected String getMainSchemaName() throws MetaModelException {
         return getMainSchema().getName();
-    }
-
-    @Override
-    protected DataSet materializeMainSchemaTable(Table table, Column[] columns, int maxRows) {
-        final Query q = new Query().from(table).select(columns);
-        if (maxRows > 0) {
-            q.setMaxRows(maxRows);
-        }
-        final String queryString = q.toSql();
-
-        final String escapedQuery = UrlEscapers.urlPathSegmentEscaper().escape(queryString);
-        final Map<String, Object> resultMap = invokeHttpGetAndParseMap(_baseUrl + "/query/" + escapedQuery);
-
-        @SuppressWarnings("unchecked")
-        final List<List<Object>> rowValues = (List<List<Object>>) resultMap.get("data");
-
-        final DataSetHeader header = new SimpleDataSetHeader(columns);
-        final InMemoryDataSet dataSet = new InMemoryDataSet(header, CollectionUtils.map(rowValues,
-                new Func<List<Object>, Row>() {
-                    @Override
-                    public Row eval(List<Object> values) {
-                        return new DefaultRow(header, values.toArray());
-                    }
-                }));
-        return dataSet;
     }
 }
